@@ -30,3 +30,9 @@ func (tag *Tag) GetTagByName(name string) {
 func (tag *Tag) Save() {
 	DB().Save(&tag)
 }
+
+// GetTagByType 通过属性获取标签
+func (tag *Tag) GetTagByType(name string) (tags []Tag) {
+	DB().Where(Tag{Type: name, IsShow: 1}).Order("id ASC").Find(&tags)
+	return
+}

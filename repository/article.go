@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/GanEasy/wxrank/orm"
+	"github.com/GanEasy/wxrankapi/orm"
 	"github.com/yizenghui/sda/wechat"
 )
 

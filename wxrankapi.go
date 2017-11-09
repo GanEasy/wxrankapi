@@ -6,7 +6,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/GanEasy/wxrank/repository"
+	"github.com/GanEasy/wxapi/job"
+	"github.com/GanEasy/wxapi/repository"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 )
@@ -75,6 +76,18 @@ func Articles(c echo.Context) error {
 	return c.JSON(http.StatusOK, articles)
 }
 
+//Tags 标签列表接口
+func Tags(c echo.Context) error {
+	t := c.QueryParam("type")
+
+	tags, err := repository.GetTagByType(t)
+
+	if err != nil {
+
+	}
+	return c.JSON(http.StatusOK, tags)
+}
+
 //View 阅读
 func View(c echo.Context) error {
 
@@ -94,7 +107,13 @@ func Fetch(c echo.Context) error {
 	url := c.QueryParam("url")
 	// fmt.Println(url)
 	if url != "" {
-		repository.Post(url)
+		// repository.Post(url)
+		// 列队任务, 防止高并发攻击
+		job.JobQueue <- job.Job{
+			Task: &job.TaskSpider{
+				URL: url,
+			},
+		}
 		return c.JSON(http.StatusOK, "1")
 	}
 	return c.JSON(http.StatusOK, "0")
@@ -138,6 +157,9 @@ func main() {
 
 	// 获取微信文章接口
 	e.GET("/article", Articles)
+
+	// 获取标签接口
+	e.GET("/tags", Tags)
 
 	e.File("/favicon.ico", "favicon.ico")
 

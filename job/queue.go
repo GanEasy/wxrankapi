@@ -1,33 +1,33 @@
-package notice
+package job
 
 import (
 	"fmt"
 	"time"
 )
 
-// Notice 通知接口
-type Notice interface {
-	Send()
+// Task 任务接口
+type Task interface {
+	RunTask()
 }
 
-//NoticeDemo struct
-type NoticeDemo struct {
+//TaskDemo struct
+type TaskDemo struct {
 	OpenID string
 	Text   string
 }
 
-//Send Notice.Run
-func (p *NoticeDemo) Send() {
+//RunTask 实现 Task.RunTask()
+func (p *TaskDemo) RunTask() {
 	time.Sleep(time.Second)
 	fmt.Printf("给 %s 发送内容 %s\n", p.OpenID, p.Text)
 }
 
 // Job represents the job to be run
 type Job struct {
-	Notice Notice
+	Task Task
 }
 
-// A buffered channel that we can send work requests on.
+//JobQueue  A buffered channel that we can send work requests on.
 var JobQueue chan Job
 
 // Worker represents the worker that executes the job
@@ -37,6 +37,7 @@ type Worker struct {
 	quit       chan bool
 }
 
+//NewWorker new  worker
 func NewWorker(workerPool chan chan Job) Worker {
 	return Worker{
 		WorkerPool: workerPool,
@@ -54,13 +55,8 @@ func (w Worker) Start() {
 
 			select {
 			case job := <-w.JobChannel:
-				// we have received a work request.
-				// if err := job.Payload.UploadToS3(); err != nil {
-				// 	log.Errorf("Error uploading to S3: %s", err.Error())
-				// }
-				// fmt.Println(job)
-
-				job.Notice.Send()
+				// 执行任务
+				job.Task.RunTask()
 			case <-w.quit:
 				// we have received a signal to stop
 				return
@@ -76,17 +72,20 @@ func (w Worker) Stop() {
 	}()
 }
 
+//Dispatcher 工作池
 type Dispatcher struct {
 	// A pool of workers channels that are registered with the dispatcher
 	MaxWorkers int
 	WorkerPool chan chan Job
 }
 
+//NewDispatcher 创建新的工作池
 func NewDispatcher(maxWorkers int) *Dispatcher {
 	pool := make(chan chan Job, maxWorkers)
 	return &Dispatcher{WorkerPool: pool, MaxWorkers: maxWorkers}
 }
 
+//Run Dispatcher.Run 工作池开始工作
 func (d *Dispatcher) Run() {
 	// starting n number of workers
 	for i := 0; i < d.MaxWorkers; i++ {
@@ -97,12 +96,13 @@ func (d *Dispatcher) Run() {
 	go d.dispatch()
 }
 
+// 工作池列队工作
 func (d *Dispatcher) dispatch() {
 	for {
 		select {
 		case job := <-JobQueue:
 			// a job request has been received
-			go func(job Job) {
+			go func(job Job) { // 异步入队 避免阻塞
 				// func(job Job) {
 				// try to obtain a worker job channel that is available.
 				// this will block until a worker is idle
@@ -116,14 +116,16 @@ func (d *Dispatcher) dispatch() {
 	}
 }
 
+// 初始化
 func init() {
 
-	maxWorkers := 1
-	maxQueue := 2
+	maxWorkers := 1   // 工作池中的并发数
+	maxQueue := 20000 // 如果1个 task 2KB的话， 20000 约 40M内存
 	//初始化一个调试者,并指定它可以操作的 工人个数
 	dispatch := NewDispatcher(maxWorkers)
 	JobQueue = make(chan Job, maxQueue) //指定任务的队列长度
 	//并让它一直接运行
 	dispatch.Run()
+	// fmt.Println("dispatch.Run")
 	// close(notice.JobQueue)
 }

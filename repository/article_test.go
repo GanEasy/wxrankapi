@@ -12,7 +12,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/GanEasy/wxrank/orm"
+	"github.com/GanEasy/wxrankapi/orm"
 	"github.com/PuerkitoBio/goquery"
 	"github.com/yizenghui/sda/wechat"
 )
