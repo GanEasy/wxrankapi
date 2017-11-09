@@ -6,8 +6,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/GanEasy/wxapi/job"
-	"github.com/GanEasy/wxapi/repository"
+	"github.com/GanEasy/wxrankapi/job"
+	"github.com/GanEasy/wxrankapi/repository"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 )

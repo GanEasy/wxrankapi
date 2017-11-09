@@ -32,8 +32,8 @@ func newDB() (*gorm.DB, error) {
 	// db, err := gorm.Open(conf.Conf.DB.Type, sqlConnection)
 	// db, err := gorm.Open("sqlite3", "notice.db")
 
-	db, err := gorm.Open("postgres", "host=localhost user=postgres dbname=wxrank sslmode=disable password=123456")
-	// db, err := gorm.Open("postgres", "host=192.157.192.118 user=xiaoyi dbname=spider sslmode=disable password=123456")
+	// db, err := gorm.Open("postgres", "host=localhost user=postgres dbname=wxrank sslmode=disable password=123456")
+	db, err := gorm.Open("postgres", "host=119.23.237.215 user=xiaoyi dbname=wxrank sslmode=disable password=123456")
 
 	if err != nil {
 		return nil, err
