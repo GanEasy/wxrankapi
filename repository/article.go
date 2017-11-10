@@ -41,7 +41,7 @@ func GetArticle(limit, offset, tag int, order string) (articles []orm.Article, e
 	// var articles []orm.Article
 
 	if order == "id" {
-		order = "id DESC"
+		order = "pub_at DESC, id ASC"
 	} else {
 		order = "rank DESC"
 	}

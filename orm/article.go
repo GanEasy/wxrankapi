@@ -14,7 +14,7 @@ type Article struct {
 	Author    string    // 作者
 	Cover     string    // 封面
 	Intro     string    // 介绍
-	PubAt     time.Time // 微信文章发布时间
+	PubAt     time.Time `sql:"index"` // 微信文章发布时间
 	MediaID   uint
 	View      int64         `gorm:"default:0"`                      // 点击次数，通过它进行计算排名
 	URL       string        `gorm:"type:varchar(255);unique_index"` // 微信文章地址
