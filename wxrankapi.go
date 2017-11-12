@@ -87,6 +87,18 @@ func Tags(c echo.Context) error {
 	return c.JSON(http.StatusOK, tags)
 }
 
+//Search 标签列表搜索接口
+func Search(c echo.Context) error {
+	t := c.QueryParam("s")
+
+	tags, err := repository.GetTagsByTitle(t)
+
+	if err != nil {
+
+	}
+	return c.JSON(http.StatusOK, tags)
+}
+
 //Tag 标签详细
 func Tag(c echo.Context) error {
 	id, _ := strconv.Atoi(c.Param("id"))
@@ -173,6 +185,7 @@ func main() {
 	// 获取标签接口
 	e.GET("/tags", Tags)
 	e.GET("/tag/:id", Tag)
+	e.GET("/search", Search)
 
 	e.File("/favicon.ico", "favicon.ico")
 
