@@ -13,7 +13,6 @@ import (
 
 func init() {
 	orm.DB().AutoMigrate(&orm.Tag{}, &orm.Article{}, &orm.Media{}, &orm.Post{})
-
 }
 
 // Find wechat.Article
@@ -36,17 +35,11 @@ func Insert(url string) (article wechat.Article, err error) {
 }
 
 //GetArticle 获取文章列表
-func GetArticle(limit, offset, tag int, order string) (articles []orm.Article, err error) {
+func GetArticle(limit, offset, tag int) (articles []orm.Article, err error) {
 	var a orm.Article
 	// var articles []orm.Article
 
-	if order == "id" {
-		order = "pub_at DESC, id ASC"
-	} else {
-		order = "rank DESC,pub_at DESC"
-	}
-
-	articles = a.GetArticle(limit, offset, tag, order)
+	articles = a.GetArticle(limit, offset, tag, "rank DESC,pub_at DESC")
 
 	// orm.DB().Offset(offset).Limit(limit).Order("rank DESC").Find(&articles)
 	for key, article := range articles {
@@ -89,6 +82,20 @@ func View(id int) (a orm.Article, err error) {
 	}
 
 	a.Cover = "http://pic3.readfollow.com/" + base64.URLEncoding.EncodeToString([]byte(a.Cover))
+
+	return
+}
+
+//Tag ..
+func Tag(id int) (tag orm.Tag, err error) {
+
+	// var a orm.Article
+	tag.GetTagByID(id)
+
+	if tag.Title == "" {
+		err = errors.New("内容异常")
+		return
+	}
 
 	return
 }

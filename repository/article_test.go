@@ -102,13 +102,7 @@ func Test_Pos22t(t *testing.T) {
 }
 
 func Test_GetArticle(t *testing.T) {
-	articles, _ := GetArticle(5, 0, 0, "id")
-	fmt.Println(articles)
-	t.Error(articles)
-
-}
-func Test_New2(t *testing.T) {
-	articles, _ := GetArticle(5, 0, 2, "id")
+	articles, _ := GetArticle(5, 0, 0)
 	fmt.Println(articles)
 	t.Error(articles)
 

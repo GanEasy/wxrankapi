@@ -57,7 +57,6 @@ func Articles(c echo.Context) error {
 	limit, _ := strconv.Atoi(c.QueryParam("limit"))
 	offset, _ := strconv.Atoi(c.QueryParam("offset"))
 	tag, _ := strconv.Atoi(c.QueryParam("tag"))
-	order := c.QueryParam("order")
 
 	if limit <= 0 || limit > 100 {
 		limit = 10
@@ -67,7 +66,7 @@ func Articles(c echo.Context) error {
 		offset = 0
 	}
 
-	articles, err := repository.GetArticle(limit, offset, tag, order)
+	articles, err := repository.GetArticle(limit, offset, tag)
 
 	if err != nil {
 
@@ -86,6 +85,19 @@ func Tags(c echo.Context) error {
 
 	}
 	return c.JSON(http.StatusOK, tags)
+}
+
+//Tag 标签详细
+func Tag(c echo.Context) error {
+	id, _ := strconv.Atoi(c.Param("id"))
+
+	tag, err := repository.Tag(id)
+
+	if err != nil {
+
+	}
+
+	return c.JSON(http.StatusOK, tag)
 }
 
 //View 阅读
@@ -160,6 +172,7 @@ func main() {
 
 	// 获取标签接口
 	e.GET("/tags", Tags)
+	e.GET("/tag/:id", Tag)
 
 	e.File("/favicon.ico", "favicon.ico")
 
