@@ -43,7 +43,7 @@ func GetArticle(limit, offset, tag int, order string) (articles []orm.Article, e
 	if order == "id" {
 		order = "pub_at DESC, id ASC"
 	} else {
-		order = "rank DESC"
+		order = "rank DESC,pub_at DESC"
 	}
 
 	articles = a.GetArticle(limit, offset, tag, order)
@@ -81,11 +81,7 @@ func View(id int) (a orm.Article, err error) {
 		return
 	}
 
-	if a.View < 1 {
-		a.View = 1
-	} else {
-		a.View++
-	}
+	a.View++
 
 	if a.ID != 0 {
 		a.Rank = Rank(int(a.View), 0, a.PubAt.Unix())
@@ -146,13 +142,16 @@ func Post(url string) (err error) {
 		a.Author = article.Author
 		// todo 标签管理，需要保留自定义标签
 		a.Tags = media.Tags // 文章的标签等于公众号的标签
-
+		a.View++
 		i64, err := strconv.ParseInt(article.PubAt, 10, 64)
 		if err != nil {
 			// fmt.Println(err)
 			return errors.New("时间转化失败")
 		}
 		a.PubAt = time.Unix(i64, 0)
+
+		a.Rank = Rank(int(a.View), 0, a.PubAt.Unix())
+
 		a.Save()
 		// panic(a.ID)
 		// fmt.Println(a)
