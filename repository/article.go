@@ -39,7 +39,7 @@ func GetArticle(limit, offset, tag int) (articles []orm.Article, err error) {
 	var a orm.Article
 	// var articles []orm.Article
 
-	articles = a.GetArticle(limit, offset, tag, "rank DESC,pub_at DESC")
+	articles = a.GetArticle(limit, offset, tag, "rank DESC,pub_at DESC,id ASC")
 
 	// orm.DB().Offset(offset).Limit(limit).Order("rank DESC").Find(&articles)
 	for key, article := range articles {
