@@ -25,11 +25,15 @@ func Rank(vote int, devote int, timestamp int64) float64 {
 	survivalTime := timestamp - fund
 
 	// 投票方向与时间造成的系数差
-	var timeMagin int64
+	var timeMagin float64
+
+	// 倍率
+	var rate = float64(survivalTime) / float64(86400)
+
 	if voteDiff > 0 {
-		timeMagin = survivalTime / 45000
+		timeMagin = rate
 	} else if voteDiff < 0 {
-		timeMagin = -1 * survivalTime / 45000
+		timeMagin = -1 * rate
 	} else {
 		timeMagin = 0
 	}
