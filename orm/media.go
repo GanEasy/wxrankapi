@@ -18,7 +18,7 @@ type Media struct {
 	UpdatedAt time.Time
 	DeletedAt *time.Time    `sql:"index"`
 	Tags      pq.Int64Array `gorm:"type:int[]"` // 标签(文章继承)
-
+	Articles  []Article
 }
 
 // GetMediaByID 获取 Media

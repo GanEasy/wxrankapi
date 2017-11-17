@@ -75,6 +75,42 @@ func Articles(c echo.Context) error {
 	return c.JSON(http.StatusOK, articles)
 }
 
+//NewArticles 最新收录文章接口
+func NewArticles(c echo.Context) error {
+
+	limit, _ := strconv.Atoi(c.QueryParam("limit"))
+
+	tag, _ := strconv.Atoi(c.QueryParam("tag"))
+
+	id, _ := strconv.Atoi(c.QueryParam("id"))
+
+	if limit <= 0 || limit > 100 {
+		limit = 10
+	}
+
+	articles, _ := repository.GetArticleCursorByID(id, limit, tag)
+
+	return c.JSON(http.StatusOK, articles)
+}
+
+//HotArticles 文章接口 根据热门程序进行游标提取
+func HotArticles(c echo.Context) error {
+
+	limit, _ := strconv.Atoi(c.QueryParam("limit"))
+
+	tag, _ := strconv.Atoi(c.QueryParam("tag"))
+
+	rank, _ := strconv.ParseFloat(c.QueryParam("rank"), 64)
+
+	if limit <= 0 || limit > 100 {
+		limit = 10
+	}
+
+	articles, _ := repository.GetArticleCursorByRank(rank, limit, tag)
+
+	return c.JSON(http.StatusOK, articles)
+}
+
 //Tags 标签列表接口
 func Tags(c echo.Context) error {
 	t := c.QueryParam("type")
@@ -181,6 +217,10 @@ func main() {
 
 	// 获取微信文章接口
 	e.GET("/article", Articles)
+
+	// 获取微信文章接口
+	e.GET("/new", NewArticles)
+	e.GET("/hot", HotArticles)
 
 	// 获取标签接口
 	e.GET("/tags", Tags)

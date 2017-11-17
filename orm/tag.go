@@ -42,3 +42,9 @@ func (tag *Tag) GetTagsByTitle(name string) (tags []Tag) {
 	DB().Where(Tag{Title: name}).Order("id ASC").Find(&tags)
 	return
 }
+
+// GetTagsByIDS 通过ID获取标签
+func (tag *Tag) GetTagsByIDS(ids []int64) (tags []Tag) {
+	DB().Where(ids).Find(&tags)
+	return
+}

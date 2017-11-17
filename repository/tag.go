@@ -1,6 +1,11 @@
 package repository
 
-import "github.com/GanEasy/wxrankapi/orm"
+import (
+	"strconv"
+	"strings"
+
+	"github.com/GanEasy/wxrankapi/orm"
+)
 
 func init() {
 
@@ -38,6 +43,23 @@ func GetTagsByTitle(name string) (tags []orm.Tag, err error) {
 	if name != "" {
 		var tag orm.Tag
 		tags = tag.GetTagsByTitle(name)
+	}
+	return
+}
+
+//GetTagsByIDS ..通过id获取标签
+func GetTagsByIDS(idstr string) (tags []orm.Tag, err error) {
+	var ids []int64
+	arr := strings.Split(idstr, ",")
+	for _, id := range arr {
+		c, e := strconv.Atoi(id)
+		if e == nil {
+			ids = append(ids, int64(c))
+		}
+	}
+	if len(ids) > 0 {
+		var tag orm.Tag
+		tags = tag.GetTagsByIDS(ids)
 	}
 	return
 }

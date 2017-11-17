@@ -3,6 +3,7 @@ package repository
 import (
 	"encoding/base64"
 	"errors"
+	"fmt"
 	"strconv"
 	"strings"
 	"time"
@@ -39,28 +40,66 @@ func GetArticle(limit, offset, tag int) (articles []orm.Article, err error) {
 	var a orm.Article
 	// var articles []orm.Article
 
-	articles = a.GetArticle(limit, offset, tag, "rank DESC,pub_at DESC,id ASC")
+	// articles = a.GetArticle(limit, offset, tag, "rank DESC,pub_at DESC,id ASC")
+	articles = a.GetArticle(limit, offset, tag, "pub_at DESC,id ASC")
 
 	// orm.DB().Offset(offset).Limit(limit).Order("rank DESC").Find(&articles)
 	for key, article := range articles {
-		// articles[key].Cover = "http://localhost:8004/image/" + base64.URLEncoding.EncodeToString([]byte(article.Cover))
-		articles[key].Cover = "http://pic3.readfollow.com/" + base64.URLEncoding.EncodeToString([]byte(article.Cover))
-		article.URL = strings.Replace(article.URL, `http://`, `https://`, -1)
-		articles[key].URL = strings.Replace(article.URL, `#rd`, "&scene=27#wechat_redirect", 1)
-
-		article.Title = strings.Replace(article.Title, `\x26quot;`, `"`, -1)
-		article.Title = strings.Replace(article.Title, `\x26amp;`, `&`, -1)
-		article.Title = strings.Replace(article.Title, `\x0a`, "\n", -1)
-		articles[key].Title = article.Title
-
-		article.Intro = strings.Replace(article.Intro, `\x0a`, "\n", -1)
-		article.Intro = strings.Replace(article.Intro, `\x26quot;`, `"`, -1)
-		article.Intro = strings.Replace(article.Intro, `\x26amp;`, `&`, -1)
-		articles[key].Intro = article.Intro
-
+		ArticleAfter(&article)
+		articles[key] = article
 	}
 
 	return
+}
+
+//GetArticleCursorByID 通过ID游标方式获取最新收录文章
+func GetArticleCursorByID(id, limit, tag int) (articles []orm.Article, err error) {
+	var a orm.Article
+	// var articles []orm.Article
+
+	// articles = a.GetArticle(limit, offset, tag, "rank DESC,pub_at DESC,id ASC")
+	articles = a.GetArticleCursorByID(id, limit, tag)
+
+	// orm.DB().Offset(offset).Limit(limit).Order("rank DESC").Find(&articles)
+	for key, article := range articles {
+		ArticleAfter(&article)
+		articles[key] = article
+	}
+
+	return
+}
+
+//GetArticleCursorByRank 通过Rank游标方式获取热门文章
+func GetArticleCursorByRank(rank float64, limit, tag int) (articles []orm.Article, err error) {
+	var a orm.Article
+	// var articles []orm.Article
+
+	// articles = a.GetArticle(limit, offset, tag, "rank DESC,pub_at DESC,id ASC")
+	articles = a.GetArticleCursorByRank(rank, limit, tag)
+
+	// orm.DB().Offset(offset).Limit(limit).Order("rank DESC").Find(&articles)
+	for key, article := range articles {
+		ArticleAfter(&article)
+		articles[key] = article
+	}
+
+	return
+}
+
+// ArticleAfter 修改文章
+func ArticleAfter(article *orm.Article) {
+	article.Cover = "http://pic3.readfollow.com/" + base64.URLEncoding.EncodeToString([]byte(article.Cover))
+	article.URL = strings.Replace(article.URL, `http://`, `https://`, -1)
+	article.URL = strings.Replace(article.URL, `#rd`, "&scene=27#wechat_redirect", 1)
+
+	article.Title = strings.Replace(article.Title, `\x26quot;`, `"`, -1)
+	article.Title = strings.Replace(article.Title, `\x26amp;`, `&`, -1)
+	article.Title = strings.Replace(article.Title, `\x0a`, "\n", -1)
+
+	article.Intro = strings.Replace(article.Intro, `\x0a`, "\n", -1)
+	article.Intro = strings.Replace(article.Intro, `\x26quot;`, `"`, -1)
+	article.Intro = strings.Replace(article.Intro, `\x26amp;`, `&`, -1)
+
 }
 
 //View ..
@@ -157,13 +196,32 @@ func Post(url string) (err error) {
 		}
 		a.PubAt = time.Unix(i64, 0)
 
-		a.Rank = Rank(int(a.View), 0, a.PubAt.Unix())
+		a.Rank = ArticleRank(a)
+
+		// panic(a.ID)
 
 		a.Save()
-		// panic(a.ID)
 		// fmt.Println(a)
 	}
 	// }
+	return
+}
+
+//ArticleRank 获取文章RANK 该rank具有维一性，可作游标
+func ArticleRank(article orm.Article) (rank float64) {
+	t := article.PubAt.Unix()
+	r := Rank(int(article.View), 0, t)
+
+	s := fmt.Sprintf("%.2f", r)
+
+	h := article.PubAt.Format("15")
+
+	str := fmt.Sprintf(`%v%v%d`, s, h, article.ID)
+
+	rank, err := strconv.ParseFloat(str, 64)
+	if err != nil {
+		return
+	}
 	return
 }
 
