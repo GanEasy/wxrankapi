@@ -125,20 +125,6 @@ func View(id int) (a orm.Article, err error) {
 	return
 }
 
-//Tag ..
-func Tag(id int) (tag orm.Tag, err error) {
-
-	// var a orm.Article
-	tag.GetTagByID(id)
-
-	if tag.Title == "" {
-		err = errors.New("内容异常")
-		return
-	}
-
-	return
-}
-
 // Post ... url
 func Post(url string) (err error) {
 	var post orm.Post

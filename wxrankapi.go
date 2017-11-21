@@ -148,6 +148,19 @@ func Tag(c echo.Context) error {
 	return c.JSON(http.StatusOK, tag)
 }
 
+//GetTagByMediaID 通过公众号ID获取标签详细
+func GetTagByMediaID(c echo.Context) error {
+	id, _ := strconv.Atoi(c.Param("id"))
+
+	tag, err := repository.GetTagByMediaID(id)
+
+	if err != nil {
+
+	}
+
+	return c.JSON(http.StatusOK, tag)
+}
+
 //View 阅读
 func View(c echo.Context) error {
 
@@ -160,6 +173,20 @@ func View(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, article)
+}
+
+//Media 公众号
+func Media(c echo.Context) error {
+
+	id, _ := strconv.Atoi(c.Param("id"))
+
+	media, err := repository.GetMediaByID(id)
+
+	if err != nil {
+
+	}
+
+	return c.JSON(http.StatusOK, media)
 }
 
 //Fetch get 报料接口
@@ -212,6 +239,8 @@ func main() {
 	e.GET("/fetch", Fetch)
 	e.POST("/post", Post)
 
+	// 获取公众号接口
+	e.GET("/media/:id", Media)
 	// 用户查看文章时请求该接口
 	e.GET("/view/:id", View)
 
@@ -226,6 +255,7 @@ func main() {
 	e.GET("/tags", Tags)
 	e.GET("/tag/:id", Tag)
 	e.GET("/search", Search)
+	e.GET("/gettagbymedia/:id", GetTagByMediaID)
 
 	e.File("/favicon.ico", "favicon.ico")
 

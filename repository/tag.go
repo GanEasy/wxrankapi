@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"errors"
 	"strconv"
 	"strings"
 
@@ -27,6 +28,38 @@ func init() {
 	// 	tag.Save()
 	// }
 
+}
+
+//Tag ..
+func Tag(id int) (tag orm.Tag, err error) {
+
+	// var a orm.Article
+	tag.GetTagByID(id)
+
+	if tag.Title == "" {
+		err = errors.New("内容异常")
+		return
+	}
+
+	return
+}
+
+//GetTagByMediaID ..
+func GetTagByMediaID(id int) (tag orm.Tag, err error) {
+	media, err := GetMediaByID(id)
+	if media.AppID != "" {
+		// var a orm.Article
+		tag.GetTagByName(media.AppID)
+	} else {
+
+		err = errors.New("无法获取公众号AppID")
+	}
+
+	if tag.Title == "" {
+		err = errors.New("获取标签失败")
+	}
+
+	return
 }
 
 //GetTagByType ..通过属性获取标签
