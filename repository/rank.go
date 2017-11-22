@@ -23,6 +23,10 @@ func Rank(vote int, devote int, timestamp int64) float64 {
 	projectStartTime, _ := time.Parse("2006-01-02", "2017-09-01")
 	fund := projectStartTime.Unix() - 8*3600
 	survivalTime := timestamp - fund
+	// 如果文章发布时间小于项目创建时间，时差统算为0
+	if survivalTime < 0 {
+		survivalTime = 0
+	}
 
 	// 投票方向与时间造成的系数差
 	var timeMagin float64

@@ -120,7 +120,52 @@ func View(id int) (a orm.Article, err error) {
 		a.Save()
 	}
 
-	a.Cover = "http://pic3.readfollow.com/" + base64.URLEncoding.EncodeToString([]byte(a.Cover))
+	ArticleAfter(&a)
+	return
+}
+
+//Like ..
+func Like(id int) (a orm.Article, err error) {
+
+	// var a orm.Article
+	a.GetArticleByID(id)
+
+	if a.Title == "" {
+		err = errors.New("内容异常")
+		return
+	}
+
+	a.Like++
+
+	if a.ID != 0 {
+		a.Rank = ArticleRank(a)
+		a.Save()
+	}
+
+	ArticleAfter(&a)
+
+	return
+}
+
+//Hate ..
+func Hate(id int) (a orm.Article, err error) {
+
+	// var a orm.Article
+	a.GetArticleByID(int(id))
+
+	if a.Title == "" {
+		err = errors.New("内容异常")
+		return
+	}
+
+	a.Hate++
+
+	if a.ID != 0 {
+		a.Rank = ArticleRank(a)
+		a.Save()
+	}
+
+	ArticleAfter(&a)
 
 	return
 }
@@ -193,17 +238,25 @@ func Post(url string) (err error) {
 	return
 }
 
-//ArticleRank 获取文章RANK 该rank具有维一性，可作游标
+//ArticleRank 获取文章RANK 该rank具有维一性，可作游标  通过创建时间计算期分值，以赞同否定作为偏移值
 func ArticleRank(article orm.Article) (rank float64) {
-	t := article.PubAt.Unix()
-	r := Rank(int(article.View), 0, t)
+	// 根据创建时间进行排列
+	t := article.CreatedAt.Unix()
 
+	// 如果否定的票数比赞同多5票，将会得0分，多6票的话，将得负分
+	r := Rank(int(article.Like+5), int(article.Hate), t)
+
+	// 得分截取 0.12 分位
 	s := fmt.Sprintf("%.2f", r)
 
-	h := article.PubAt.Format("15")
+	// 发布时间截取 日、时
+	h := article.PubAt.Format("0215")
 
+	//todo 截取文章ID最多6位
+	// 组装成 rank 值   0.12 得分 + 日、时 + 文章ID
 	str := fmt.Sprintf(`%v%v%d`, s, h, article.ID)
 
+	// 字符串格式化成浮点数
 	rank, err := strconv.ParseFloat(str, 64)
 	if err != nil {
 		return

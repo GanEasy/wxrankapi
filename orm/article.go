@@ -20,6 +20,8 @@ type Article struct {
 	PubAt     time.Time `sql:"index"` // 微信文章发布时间
 	MediaID   uint
 	Media     Media
+	Like      int64         `gorm:"default:0"`
+	Hate      int64         `gorm:"default:0"`
 	View      int64         `gorm:"default:0"`                      // 点击次数，通过它进行计算排名
 	URL       string        `gorm:"type:varchar(255);unique_index"` // 微信文章地址
 	Rank      float64       `sql:"index"`                           // 排行
@@ -32,7 +34,7 @@ type Article struct {
 
 // GetArticleByID 获取Article
 func (article *Article) GetArticleByID(id int) {
-	DB().First(article, id)
+	DB().Preload("Media").First(article, id)
 }
 
 // GetArticleByURL 通过url获取Article 如果没有的话进行初始化 (注：此url由文章详细页获得)

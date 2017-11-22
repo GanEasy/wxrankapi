@@ -175,6 +175,34 @@ func View(c echo.Context) error {
 	return c.JSON(http.StatusOK, article)
 }
 
+//Like 喜欢
+func Like(c echo.Context) error {
+
+	id, _ := strconv.Atoi(c.Param("id"))
+
+	article, err := repository.Like(id)
+
+	if err != nil {
+
+	}
+
+	return c.JSON(http.StatusOK, article)
+}
+
+//Hate 讨厌
+func Hate(c echo.Context) error {
+
+	id, _ := strconv.Atoi(c.Param("id"))
+
+	article, err := repository.Hate(id)
+
+	if err != nil {
+
+	}
+
+	return c.JSON(http.StatusOK, article)
+}
+
 //Media 公众号
 func Media(c echo.Context) error {
 
@@ -243,6 +271,10 @@ func main() {
 	e.GET("/media/:id", Media)
 	// 用户查看文章时请求该接口
 	e.GET("/view/:id", View)
+	// 赞同文章
+	e.GET("/like/:id", Like)
+	// 否定文章 如果否定比赞同多5票，评分为0
+	e.GET("/hate/:id", Hate)
 
 	// 获取微信文章接口
 	e.GET("/article", Articles)
