@@ -5,12 +5,11 @@
 package repository
 
 import "testing"
-import "fmt"
 
 func Test_GetSign(t *testing.T) {
-	js, err := GetSign("o7UTkjr7if4AQgcPmveQ5wJ5alsA")
+	js, err := GetSign("http://readfoww.com/t/1")
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(js)
+	t.Fatal(js)
 }

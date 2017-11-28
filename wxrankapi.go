@@ -234,6 +234,14 @@ func Fetch(c echo.Context) error {
 	return c.JSON(http.StatusOK, "0")
 }
 
+//JsSDK 微信JS接口
+func JsSDK(c echo.Context) error {
+	url := c.QueryParam("url")
+
+	js, _ := repository.GetSign(url)
+	return c.JSON(http.StatusOK, js)
+}
+
 //Post 报料接口
 func Post(c echo.Context) error {
 	url := c.FormValue("url")
@@ -282,6 +290,8 @@ func main() {
 	// 获取微信文章接口
 	e.GET("/new", NewArticles)
 	e.GET("/hot", HotArticles)
+
+	e.GET("/jssdk", JsSDK)
 
 	// 获取标签接口
 	e.GET("/tags", Tags)
