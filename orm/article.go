@@ -73,23 +73,17 @@ func (article *Article) GetArticle(limit, offset, tag int, order string) (articl
 }
 
 // GetArticleCursorByID 以ID为游标获取数据
-func (article *Article) GetArticleCursorByID(id, limit, tag int) (articles []Article) {
-	var selectTag pq.Int64Array
-	if tag != 0 {
-		selectTag = append(selectTag, int64(tag))
-	}
-	DB().Scopes(ScopesCursorID(int64(id))).Preload("Media").Scopes(ScopesTag(selectTag)).Limit(limit).Order("id DESC").Find(&articles)
+func (article *Article) GetArticleCursorByID(id, limit int, tags []int64) (articles []Article) {
+
+	DB().Scopes(ScopesCursorID(int64(id))).Preload("Media").Scopes(ScopesTag(tags)).Limit(limit).Order("id DESC").Find(&articles)
 
 	return
 }
 
 // GetArticleCursorByRank 以Rank为游标获取数据
-func (article *Article) GetArticleCursorByRank(rank float64, limit, tag int) (articles []Article) {
-	var selectTag pq.Int64Array
-	if tag != 0 {
-		selectTag = append(selectTag, int64(tag))
-	}
-	DB().Scopes(ScopesCursorRank(rank)).Preload("Media").Scopes(ScopesTag(selectTag)).Limit(limit).Order("rank DESC").Find(&articles)
+func (article *Article) GetArticleCursorByRank(rank float64, limit int, tags []int64) (articles []Article) {
+
+	DB().Scopes(ScopesCursorRank(rank)).Preload("Media").Scopes(ScopesTag(tags)).Limit(limit).Order("rank DESC").Find(&articles)
 
 	return
 }
@@ -103,7 +97,7 @@ func ScopesTag(tags []int64) func(db *gorm.DB) *gorm.DB {
 				p = append(p, strconv.Itoa(int(t)))
 			}
 			str := strings.Join(p, ",")
-			return db.Where("tags @> ?", fmt.Sprintf("{%v}", str))
+			return db.Where("tags && ?", fmt.Sprintf("{%v}", str))
 		}
 		return db
 	}

@@ -80,7 +80,7 @@ func NewArticles(c echo.Context) error {
 
 	limit, _ := strconv.Atoi(c.QueryParam("limit"))
 
-	tag, _ := strconv.Atoi(c.QueryParam("tag"))
+	tags := repository.Str2Int64(c.QueryParam("tag"))
 
 	id, _ := strconv.Atoi(c.QueryParam("id"))
 
@@ -88,7 +88,7 @@ func NewArticles(c echo.Context) error {
 		limit = 10
 	}
 
-	articles, _ := repository.GetArticleCursorByID(id, limit, tag)
+	articles, _ := repository.GetArticleCursorByID(id, limit, tags)
 
 	return c.JSON(http.StatusOK, articles)
 }
@@ -98,7 +98,7 @@ func HotArticles(c echo.Context) error {
 
 	limit, _ := strconv.Atoi(c.QueryParam("limit"))
 
-	tag, _ := strconv.Atoi(c.QueryParam("tag"))
+	tags := repository.Str2Int64(c.QueryParam("tag"))
 
 	rank, _ := strconv.ParseFloat(c.QueryParam("rank"), 64)
 
@@ -106,7 +106,7 @@ func HotArticles(c echo.Context) error {
 		limit = 10
 	}
 
-	articles, _ := repository.GetArticleCursorByRank(rank, limit, tag)
+	articles, _ := repository.GetArticleCursorByRank(rank, limit, tags)
 
 	return c.JSON(http.StatusOK, articles)
 }

@@ -53,12 +53,12 @@ func GetArticle(limit, offset, tag int) (articles []orm.Article, err error) {
 }
 
 //GetArticleCursorByID 通过ID游标方式获取最新收录文章
-func GetArticleCursorByID(id, limit, tag int) (articles []orm.Article, err error) {
+func GetArticleCursorByID(id, limit int, tags []int64) (articles []orm.Article, err error) {
 	var a orm.Article
 	// var articles []orm.Article
 
 	// articles = a.GetArticle(limit, offset, tag, "rank DESC,pub_at DESC,id ASC")
-	articles = a.GetArticleCursorByID(id, limit, tag)
+	articles = a.GetArticleCursorByID(id, limit, tags)
 
 	// orm.DB().Offset(offset).Limit(limit).Order("rank DESC").Find(&articles)
 	for key, article := range articles {
@@ -70,12 +70,12 @@ func GetArticleCursorByID(id, limit, tag int) (articles []orm.Article, err error
 }
 
 //GetArticleCursorByRank 通过Rank游标方式获取热门文章
-func GetArticleCursorByRank(rank float64, limit, tag int) (articles []orm.Article, err error) {
+func GetArticleCursorByRank(rank float64, limit int, tags []int64) (articles []orm.Article, err error) {
 	var a orm.Article
 	// var articles []orm.Article
 
 	// articles = a.GetArticle(limit, offset, tag, "rank DESC,pub_at DESC,id ASC")
-	articles = a.GetArticleCursorByRank(rank, limit, tag)
+	articles = a.GetArticleCursorByRank(rank, limit, tags)
 
 	// orm.DB().Offset(offset).Limit(limit).Order("rank DESC").Find(&articles)
 	for key, article := range articles {
