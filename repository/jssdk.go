@@ -22,7 +22,7 @@ type JsSign struct {
 func GetSign(url string) (js JsSign, err error) {
 	js.URL = url
 	// npm install weixin-js-sdk
-	ats := core.NewDefaultAccessTokenServer("wx702b93aef72f3549", "8b69f45fc737a938cbaaffc05b192394", nil)
+	ats := core.NewDefaultAccessTokenServer("wx267866e82ab809fc", "aa23d125ec35fd0724e12ec9352ce0d0", nil)
 	clt := core.NewClient(ats, nil)
 
 	jsClt := jssdk.NewDefaultTicketServer(clt)
