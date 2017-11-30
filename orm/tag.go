@@ -16,6 +16,12 @@ type Tag struct {
 	DeletedAt *time.Time `sql:"index"`
 }
 
+// GetAllTags 获取所有 Tags
+func (tag *Tag) GetAllTags() (tags []Tag) {
+	DB().Find(&tags)
+	return
+}
+
 // GetTagByID 获取 Tag
 func (tag *Tag) GetTagByID(id int) {
 	DB().First(tag, id)

@@ -8,7 +8,27 @@ import (
 	"github.com/GanEasy/wxrankapi/orm"
 )
 
+// TagItem 标签属性 (不存在相同的标签)
+type TagItem struct {
+	ID    uint
+	Type  string
+	Title string
+}
+
+//CacheTags 缓存标签
+var CacheTags = map[int]TagItem{}
+
 func init() {
+	var tag orm.Tag
+	tags := tag.GetAllTags()
+
+	for _, t := range tags {
+		CacheTags[int(t.ID)] = TagItem{
+			t.ID,
+			t.Type,
+			t.Title,
+		}
+	}
 
 	// var initTag = []string{
 	// 	"文博",
@@ -28,6 +48,24 @@ func init() {
 	// 	tag.Save()
 	// }
 
+}
+
+//GetTagMsg ..
+func GetTagMsg(id int) (tag TagItem, err error) {
+
+	if t, ok := CacheTags[id]; ok {
+		tag = t
+	} else {
+		newTag, err := Tag(id)
+		if err == nil {
+			tag.ID = newTag.ID
+			tag.Title = newTag.Title
+			tag.Type = newTag.Type
+			CacheTags[int(newTag.ID)] = tag
+		}
+	}
+
+	return
 }
 
 //Tag ..

@@ -12,6 +12,61 @@ import (
 	"github.com/yizenghui/sda/wechat"
 )
 
+// ArticleItem 返回前台使用的文章信息
+type ArticleItem struct {
+	ID            uint
+	Title         string
+	Author        string
+	Cover         string
+	PubAt         time.Time
+	MediaTagID    int
+	MediaTagTitle string
+	Like          int
+	Hate          int
+	Rank          float64
+	URL           string
+}
+
+//GetArticleData 获取文章数据，转义返回
+func GetArticleData(article orm.Article) (data ArticleItem) {
+
+	ArticleAfter(&article)
+
+	mediaTagID := 0
+	mediaTagTitle := ""
+	for _, t := range article.Tags {
+		tagMsg, _ := GetTagMsg(int(t))
+		if tagMsg.Type == string("wxid") {
+			mediaTagID = int(tagMsg.ID)
+			mediaTagTitle = tagMsg.Title
+		}
+	}
+
+	data = ArticleItem{
+		ID:            article.ID,
+		Title:         article.Title,
+		Author:        article.Author,
+		Cover:         article.Cover,
+		PubAt:         article.PubAt,
+		MediaTagID:    mediaTagID,
+		MediaTagTitle: mediaTagTitle,
+		Like:          int(article.Like),
+		Hate:          int(article.Hate),
+		Rank:          article.Rank,
+		URL:           article.URL,
+	}
+	return
+}
+
+//GetArticlesData 获取文章数据，转义返回
+func GetArticlesData(articles []orm.Article) (rows []ArticleItem) {
+
+	for _, article := range articles {
+		rows = append(rows, GetArticleData(article))
+	}
+	return
+}
+
 func init() {
 	orm.DB().AutoMigrate(&orm.Tag{}, &orm.Article{}, &orm.Media{}, &orm.Post{})
 }
@@ -53,36 +108,18 @@ func GetArticle(limit, offset, tag int) (articles []orm.Article, err error) {
 }
 
 //GetArticleCursorByID 通过ID游标方式获取最新收录文章
-func GetArticleCursorByID(id, limit int, tags []int64) (articles []orm.Article, err error) {
+func GetArticleCursorByID(id, limit int, tags []int64) (rows []ArticleItem, err error) {
 	var a orm.Article
-	// var articles []orm.Article
-
-	// articles = a.GetArticle(limit, offset, tag, "rank DESC,pub_at DESC,id ASC")
-	articles = a.GetArticleCursorByID(id, limit, tags)
-
-	// orm.DB().Offset(offset).Limit(limit).Order("rank DESC").Find(&articles)
-	for key, article := range articles {
-		ArticleAfter(&article)
-		articles[key] = article
-	}
-
+	articles := a.GetArticleCursorByID(id, limit, tags)
+	rows = GetArticlesData(articles)
 	return
 }
 
 //GetArticleCursorByRank 通过Rank游标方式获取热门文章
-func GetArticleCursorByRank(rank float64, limit int, tags []int64) (articles []orm.Article, err error) {
+func GetArticleCursorByRank(rank float64, limit int, tags []int64) (rows []ArticleItem, err error) {
 	var a orm.Article
-	// var articles []orm.Article
-
-	// articles = a.GetArticle(limit, offset, tag, "rank DESC,pub_at DESC,id ASC")
-	articles = a.GetArticleCursorByRank(rank, limit, tags)
-
-	// orm.DB().Offset(offset).Limit(limit).Order("rank DESC").Find(&articles)
-	for key, article := range articles {
-		ArticleAfter(&article)
-		articles[key] = article
-	}
-
+	articles := a.GetArticleCursorByRank(rank, limit, tags)
+	rows = GetArticlesData(articles)
 	return
 }
 

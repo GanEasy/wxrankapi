@@ -12,14 +12,14 @@ import (
 
 // Article 文章列表
 type Article struct {
-	ID        uint      `gorm:"primary_key"`
-	Title     string    // 标题
-	Author    string    // 作者
-	Cover     string    // 封面
-	Intro     string    // 介绍
-	PubAt     time.Time `sql:"index"` // 微信文章发布时间
-	MediaID   uint
-	Media     Media
+	ID      uint      `gorm:"primary_key"`
+	Title   string    // 标题
+	Author  string    // 作者
+	Cover   string    // 封面
+	Intro   string    // 介绍
+	PubAt   time.Time `sql:"index"` // 微信文章发布时间
+	MediaID uint
+	// Media     Media
 	Like      int64         `gorm:"default:0"`
 	Hate      int64         `gorm:"default:0"`
 	View      int64         `gorm:"default:0"`                      // 点击次数，通过它进行计算排名

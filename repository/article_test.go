@@ -131,10 +131,10 @@ func Test_GetArticleCursorByID(t *testing.T) {
 	articles, _ := GetArticleCursorByID(500, 10, tags)
 
 	// fmt.Println(articles)
-	for _, a := range articles {
-		fmt.Println(ArticleRank(a))
+	// for _, a := range articles {
+	// 	// fmt.Println(ArticleRank(a))
 
-	}
+	// }
 
 	t.Error(articles)
 
@@ -145,10 +145,10 @@ func Test_GetArticleCursorByRank(t *testing.T) {
 	articles, _ := GetArticleCursorByRank(61.3837037037037, 10, tags)
 
 	// fmt.Println(articles)
-	for _, a := range articles {
-		fmt.Println(ArticleRank(a))
+	// for _, a := range articles {
+	// 	// fmt.Println(ArticleRank(a))
 
-	}
+	// }
 
 	t.Error(articles)
 
