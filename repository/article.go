@@ -258,7 +258,7 @@ func Post(url string) (err error) {
 		a.Author = article.Author
 		// todo 标签管理，需要保留自定义标签
 		a.Tags = media.Tags // 文章的标签等于公众号的标签
-		a.View++
+		// a.View++
 		i64, err := strconv.ParseInt(article.PubAt, 10, 64)
 		if err != nil {
 			// fmt.Println(err)
