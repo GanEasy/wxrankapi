@@ -123,16 +123,32 @@ func Tags(c echo.Context) error {
 	return c.JSON(http.StatusOK, tags)
 }
 
-//Search 标签列表搜索接口
-func Search(c echo.Context) error {
-	t := c.QueryParam("s")
+//SearchTags 标签搜索
+func SearchTags(c echo.Context) error {
+	s := c.QueryParam("s")
 
-	tags, err := repository.GetTagsByTitle(t)
+	tags, err := repository.SearchTags(s)
 
 	if err != nil {
 
 	}
 	return c.JSON(http.StatusOK, tags)
+}
+
+//Search 微信文章内容搜索入口
+func Search(c echo.Context) error {
+	t := c.QueryParam("s")
+	limit, _ := strconv.Atoi(c.QueryParam("limit"))
+	if limit <= 0 || limit > 100 {
+		limit = 10
+	}
+	rank, _ := strconv.ParseFloat(c.QueryParam("rank"), 64)
+	articles, err := repository.GetArticlesByTitle(t, rank, limit)
+
+	if err != nil {
+
+	}
+	return c.JSON(http.StatusOK, articles)
 }
 
 //Tag 标签详细
@@ -295,6 +311,7 @@ func main() {
 
 	// 获取标签接口
 	e.GET("/tags", Tags)
+	e.GET("/searchtags", SearchTags)
 	e.GET("/tag/:id", Tag)
 	e.GET("/search", Search)
 	e.GET("/gettagbymedia/:id", GetTagByMediaID)

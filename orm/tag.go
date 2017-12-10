@@ -49,6 +49,12 @@ func (tag *Tag) GetTagsByTitle(name string) (tags []Tag) {
 	return
 }
 
+// GetTagsByLikeTitle 通过属性获取标签
+func (tag *Tag) GetTagsByLikeTitle(name string) (tags []Tag) {
+	DB().Where("title ~ ?", name).Order("id ASC").Limit(20).Find(&tags)
+	return
+}
+
 // GetTagsByIDS 通过ID获取标签
 func (tag *Tag) GetTagsByIDS(ids []int64) (tags []Tag) {
 	DB().Where(ids).Find(&tags)

@@ -21,3 +21,9 @@ func Test_GetPost(t *testing.T) {
 	// Post.GetPostFollowBooks()
 	fmt.Println(Post)
 }
+
+func Test_SprintfString(t *testing.T) {
+	var tag Tag
+	tags := tag.GetTagsByLikeTitle(`每天`)
+	t.Fatal(tags)
+}

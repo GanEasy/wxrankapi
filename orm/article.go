@@ -65,9 +65,9 @@ func (article *Article) GetArticle(limit, offset, tag int, order string) (articl
 	if tag != 0 {
 		// selectTag = append(selectTag, int64(tag))
 		//Article{Tags: selectTag}   "tags && {?}", selectTag
-		DB().Preload("Media").Where("tags @> ?", fmt.Sprintf("{%d}", tag)).Offset(offset).Limit(limit).Order(order).Find(&articles)
+		DB().Where("tags @> ?", fmt.Sprintf("{%d}", tag)).Offset(offset).Limit(limit).Order(order).Find(&articles)
 	} else {
-		DB().Preload("Media").Offset(offset).Limit(limit).Order(order).Find(&articles)
+		DB().Offset(offset).Limit(limit).Order(order).Find(&articles)
 	}
 	return
 }
@@ -75,7 +75,15 @@ func (article *Article) GetArticle(limit, offset, tag int, order string) (articl
 // GetArticleCursorByID 以ID为游标获取数据
 func (article *Article) GetArticleCursorByID(id, limit int, tags []int64) (articles []Article) {
 
-	DB().Scopes(ScopesCursorID(int64(id))).Preload("Media").Scopes(ScopesTag(tags)).Limit(limit).Order("id DESC").Find(&articles)
+	DB().Scopes(ScopesCursorID(int64(id))).Scopes(ScopesTag(tags)).Limit(limit).Order("id DESC").Find(&articles)
+
+	return
+}
+
+// GetArticleCursorByRankForFullText 以Rank为游标 搜索文章标题
+func (article *Article) GetArticleCursorByRankForFullText(text string, rank float64, limit int) (articles []Article) {
+
+	DB().Scopes(ScopesCursorRank(rank)).Where("title ~ ?", text).Limit(limit).Order("rank DESC").Find(&articles)
 
 	return
 }
@@ -83,7 +91,7 @@ func (article *Article) GetArticleCursorByID(id, limit int, tags []int64) (artic
 // GetArticleCursorByRank 以Rank为游标获取数据
 func (article *Article) GetArticleCursorByRank(rank float64, limit int, tags []int64) (articles []Article) {
 
-	DB().Scopes(ScopesCursorRank(rank)).Preload("Media").Scopes(ScopesTag(tags)).Limit(limit).Order("rank DESC").Find(&articles)
+	DB().Scopes(ScopesCursorRank(rank)).Scopes(ScopesTag(tags)).Limit(limit).Order("rank DESC").Find(&articles)
 
 	return
 }

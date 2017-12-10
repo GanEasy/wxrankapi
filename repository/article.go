@@ -115,6 +115,14 @@ func GetArticleCursorByID(id, limit int, tags []int64) (rows []ArticleItem, err 
 	return
 }
 
+//GetArticlesByTitle 通过Rank游标方式获取热门文章
+func GetArticlesByTitle(text string, rank float64, limit int) (rows []ArticleItem, err error) {
+	var a orm.Article
+	articles := a.GetArticleCursorByRankForFullText(text, rank, limit)
+	rows = GetArticlesData(articles)
+	return
+}
+
 //GetArticleCursorByRank 通过Rank游标方式获取热门文章
 func GetArticleCursorByRank(rank float64, limit int, tags []int64) (rows []ArticleItem, err error) {
 	var a orm.Article

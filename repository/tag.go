@@ -109,6 +109,15 @@ func GetTagByType(name string) (tags []orm.Tag, err error) {
 	return
 }
 
+//SearchTags ..通过标题模糊搜索
+func SearchTags(title string) (tags []orm.Tag, err error) {
+	if title != "" {
+		var tag orm.Tag
+		tags = tag.GetTagsByLikeTitle(title)
+	}
+	return
+}
+
 //GetTagsByTitle ..通过属性获取标签
 func GetTagsByTitle(name string) (tags []orm.Tag, err error) {
 	if name != "" {
