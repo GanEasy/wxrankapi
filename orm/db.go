@@ -19,7 +19,7 @@ func DB() *gorm.DB {
 		newDb.DB().SetMaxIdleConns(10)
 		newDb.DB().SetMaxOpenConns(100)
 
-		newDb.LogMode(true)
+		newDb.LogMode(false)
 		db = newDb
 	}
 
