@@ -1,8 +1,11 @@
 package main
 
 import (
+	"fmt"
+	"html/template"
 	"net/http"
 	"strconv"
+	"strings"
 	"sync"
 	"time"
 
@@ -10,6 +13,9 @@ import (
 	"github.com/GanEasy/wxrankapi/repository"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
+	"github.com/microcosm-cc/bluemonday"
+	"github.com/russross/blackfriday"
+	"github.com/yizenghui/reader"
 )
 
 type (
@@ -272,6 +278,54 @@ func Post(c echo.Context) error {
 	return c.JSON(http.StatusOK, "0")
 }
 
+//GetContent 获取正文
+func GetContent(c echo.Context) error {
+
+	urlStr := c.QueryParam("url")
+
+	info, err := reader.GetContent(urlStr)
+	if err != nil {
+		return c.String(http.StatusOK, "0")
+	}
+
+	input := []byte(info.Content)
+	unsafe := blackfriday.MarkdownCommon(input)
+	content := bluemonday.UGCPolicy().SanitizeBytes(unsafe)
+
+	// html := fmt.Sprintf(`<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	// 						<link rel="preload" href="https://yize.gitlab.io/css/main.css" as="style" />
+	// 						%v`, string(content[:]))
+	// return c.HTML(http.StatusOK, html)
+	info.Content = fmt.Sprintf(`%v`, string(content[:]))
+
+	// 给图片加上 最大宽度
+	info.Content = strings.Replace(info.Content, `<img src=`, `<img style="max-width:100%" src=`, -1)
+	info.Content = strings.Replace(info.Content, `<section>`, `<div>`, -1)
+	info.Content = strings.Replace(info.Content, `</section>`, `</div>`, -1)
+
+	type Info struct {
+		Title   string        `json:"title"`
+		Content template.HTML `json:"content"`
+		PubAt   string        `json:"pub_at"`
+	}
+
+	return c.JSON(http.StatusOK, Info{
+		info.Title,
+		template.HTML(info.Content),
+		info.PubAt,
+	})
+}
+
+//GetList 获取列表 临时放在这里面，做小程序测试api
+func GetList(c echo.Context) error {
+	urlStr := c.QueryParam("url")
+	if urlStr == "" {
+		return c.JSON(http.StatusOK, "0")
+	}
+	links, _ := reader.GetList(urlStr)
+	return c.JSON(http.StatusOK, links)
+}
+
 func main() {
 	e := echo.New()
 	e.Use(middleware.CORS())
@@ -308,6 +362,10 @@ func main() {
 	e.GET("/hot", HotArticles)
 
 	e.GET("/jssdk", JsSDK)
+
+	// 临时做小程序api
+	e.GET("/minapp/getlist", GetList)
+	e.GET("/minapp/getcontent", GetContent)
 
 	// 获取标签接口
 	e.GET("/tags", Tags)
