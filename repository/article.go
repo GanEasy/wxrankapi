@@ -133,7 +133,7 @@ func GetArticleCursorByRank(rank float64, limit int, tags []int64) (rows []Artic
 
 // ArticleAfter 修改文章
 func ArticleAfter(article *orm.Article) {
-	article.Cover = "https://p2hr.com/" + base64.URLEncoding.EncodeToString([]byte(article.Cover))
+	article.Cover = "https://img.readfollow.com/" + base64.URLEncoding.EncodeToString([]byte(article.Cover))
 	article.URL = strings.Replace(article.URL, `http://`, `https://`, -1)
 	article.URL = strings.Replace(article.URL, `#rd`, "&scene=27#wechat_redirect", 1)
 
